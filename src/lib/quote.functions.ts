@@ -22,6 +22,8 @@ export const submitQuoteRequest = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => {
     if (!(data instanceof FormData)) throw new Error("Érvénytelen űrlapadatok.");
     const str = (key: string) => String(data.get(key) ?? "").slice(0, 2500);
+    const photoData = String(data.get("photoBase64") ?? "");
+    const photoType = String(data.get("photoType") ?? "");
     const parsed = quoteSchema.parse({
       name: str("name"),
       email: str("email"),
@@ -34,25 +36,32 @@ export const submitQuoteRequest = createServerFn({ method: "POST" })
     if (!parsed.email && !parsed.phone) {
       throw new Error("Kérjük, adjon meg e-mail címet vagy telefonszámot.");
     }
-    const photo = data.get("photo");
-    console.log("[quote-debug] photo entry:", photo?.constructor?.name, photo instanceof File ? photo.size : String(photo).slice(0, 50));
-    const hasPhoto = photo instanceof File && photo.size > 0;
-    return { ...parsed, photo: hasPhoto ? photo : null };
+    if (photoData) {
+      const approxBytes = Math.floor((photoData.length * 3) / 4);
+      if (approxBytes > MAX_PHOTO_BYTES) {
+        throw new Error("A fotó mérete legfeljebb 10 MB lehet.");
+      }
+      if (!ALLOWED_PHOTO_TYPES[photoType]) {
+        throw new Error("Csak JPG, PNG vagy WEBP formátumú fotó tölthető fel.");
+      }
+    }
+    return {
+      ...parsed,
+      photoData: photoData || null,
+      photoExt: photoData ? ALLOWED_PHOTO_TYPES[photoType] : null,
+      photoContentType: photoData ? photoType : null,
+    };
   })
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     let photoPath: string | null = null;
-    if (data.photo) {
-      if (data.photo.size > MAX_PHOTO_BYTES) {
-        throw new Error("A fotó mérete legfeljebb 10 MB lehet.");
-      }
-      const ext = ALLOWED_PHOTO_TYPES[data.photo.type];
-      if (!ext) throw new Error("Csak JPG, PNG vagy WEBP formátumú fotó tölthető fel.");
-      photoPath = `requests/${crypto.randomUUID()}.${ext}`;
+    if (data.photoData && data.photoExt && data.photoContentType) {
+      photoPath = `requests/${crypto.randomUUID()}.${data.photoExt}`;
+      const bytes = Buffer.from(data.photoData, "base64");
       const { error: uploadError } = await supabaseAdmin.storage
         .from("quote-photos")
-        .upload(photoPath, data.photo, { contentType: data.photo.type });
+        .upload(photoPath, bytes, { contentType: data.photoContentType });
       if (uploadError) throw new Error("A fotó feltöltése nem sikerült. Kérjük, próbálja újra.");
     }
 
