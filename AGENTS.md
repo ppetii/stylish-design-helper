@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Keep this business website as a single anchored home page; its navigation, filters, and quote form are client-side interactions so visitors can browse without account setup.
