@@ -53,6 +53,86 @@ function Brand() {
   </a>;
 }
 
+const inputCls = "h-11 w-full border border-border bg-background px-3 font-sans text-sm font-normal normal-case outline-none focus:border-primary";
+
+function QuoteForm() {
+  const submitQuote = useServerFn(submitQuoteRequest);
+  const formRef = useRef<HTMLFormElement>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [photoName, setPhotoName] = useState<string | null>(null);
+  const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle");
+  const [error, setError] = useState<string | null>(null);
+
+  function handlePhotoChange(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0] ?? null;
+    if (!file) { setPhotoPreview(null); setPhotoName(null); return; }
+    if (file.size > 10 * 1024 * 1024) { setError("A fotó mérete legfeljebb 10 MB lehet."); e.target.value = ""; return; }
+    setError(null);
+    setPhotoName(file.name);
+    setPhotoPreview(URL.createObjectURL(file));
+  }
+
+  function removePhoto() {
+    if (formRef.current) formRef.current.photo.value = "";
+    setPhotoPreview(null); setPhotoName(null);
+  }
+
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const fd = new FormData(form);
+    if (!String(fd.get("email") ?? "").trim() && !String(fd.get("phone") ?? "").trim()) {
+      setError("Kérjük, adjon meg e-mail címet vagy telefonszámot.");
+      return;
+    }
+    setError(null);
+    setStatus("sending");
+    try {
+      await submitQuote({ data: fd });
+      setStatus("sent");
+      form.reset();
+      setPhotoPreview(null); setPhotoName(null);
+    } catch (err) {
+      setStatus("idle");
+      setError(err instanceof Error && err.message ? err.message : "Az elküldés nem sikerült. Kérjük, próbálja újra.");
+    }
+  }
+
+  if (status === "sent") return <div className="flex flex-col items-center border border-border bg-muted/40 px-6 py-12 text-center">
+    <CheckCircle2 className="size-12 text-primary" strokeWidth={1.5} />
+    <h3 className="mt-4 font-display text-2xl font-bold">Köszönjük a megkeresést!</h3>
+    <p className="mt-2 max-w-sm text-sm leading-relaxed text-muted-foreground">Ajánlatkérését megkaptuk, referenciafotójával együtt megvizsgáljuk, és 1–2 munkanapon belül felvesszük Önnel a kapcsolatot.</p>
+    <Button variant="industrialOutline" size="lg" onClick={() => setStatus("idle")} className="mt-6 h-11 px-6 text-xs">Új ajánlatkérés</Button>
+  </div>;
+
+  return <form ref={formRef} onSubmit={handleSubmit} noValidate className="grid gap-4 sm:grid-cols-2">
+    <label className="grid gap-2 text-xs font-bold uppercase">Név *<input name="name" required maxLength={100} autoComplete="name" className={inputCls} placeholder="Az Ön neve" /></label>
+    <label className="grid gap-2 text-xs font-bold uppercase">Projekt típusa *<select name="projectType" required defaultValue="" className={inputCls}><option value="" disabled>Válasszon…</option>{projectTypes.map((type) => <option key={type} value={type}>{type}</option>)}</select></label>
+    <label className="grid gap-2 text-xs font-bold uppercase">E-mail<input name="email" type="email" maxLength={255} autoComplete="email" className={inputCls} placeholder="E-mail címe" /></label>
+    <label className="grid gap-2 text-xs font-bold uppercase">Telefonszám<input name="phone" type="tel" maxLength={30} autoComplete="tel" className={inputCls} placeholder="Telefonszáma" /></label>
+    <label className="grid gap-2 text-xs font-bold uppercase">Méretek<input name="dimensions" maxLength={200} className={inputCls} placeholder="pl. 400 × 200 cm" /></label>
+    <label className="grid gap-2 text-xs font-bold uppercase">Helyszín, település<input name="location" maxLength={200} className={inputCls} placeholder="pl. Debrecen" /></label>
+    <label className="grid gap-2 text-xs font-bold uppercase sm:col-span-2">Üzenet<textarea name="message" rows={4} maxLength={2000} className="resize-y border border-border bg-background p-3 font-sans text-sm font-normal normal-case outline-none focus:border-primary" placeholder="Meséljen a tervezett munkáról…" /></label>
+    <div className="grid gap-2 text-xs font-bold uppercase sm:col-span-2">Referenciafotó
+      {photoPreview ? <div className="flex items-center gap-3 border border-border bg-muted/40 p-3">
+        <img src={photoPreview} alt="Feltöltött referenciafotó előnézete" className="h-16 w-16 shrink-0 object-cover" />
+        <p className="min-w-0 flex-1 truncate text-xs font-normal normal-case text-muted-foreground">{photoName}</p>
+        <button type="button" onClick={removePhoto} aria-label="Fotó eltávolítása" className="text-muted-foreground hover:text-primary"><XIcon className="size-5" /></button>
+      </div> : <div className="flex items-center justify-center gap-2 border border-dashed border-border bg-muted/30 px-3 py-6 text-muted-foreground">
+        <ImagePlus className="size-5 text-primary" />
+        <p className="text-xs font-normal normal-case">Húzza ide a fotót, vagy</p>
+        <label htmlFor="quote-photo" className="cursor-pointer text-xs font-bold normal-case text-primary underline underline-offset-2">válasszon fájlt</label>
+        <input id="quote-photo" type="file" name="photo" accept="image/jpeg,image/png,image/webp" onChange={handlePhotoChange} className="sr-only" />
+        <Upload className="size-0" aria-hidden />
+      </div>}
+      <p className="text-[11px] font-normal normal-case text-muted-foreground">JPG, PNG vagy WEBP, legfeljebb 10 MB. Opcionális, de segít a pontos ajánlatban.</p>
+    </div>
+    {error && <p role="alert" className="text-xs font-semibold text-destructive sm:col-span-2">{error}</p>}
+    <p className="text-xs text-muted-foreground sm:col-span-2">A megadott adatokat kizárólag az ajánlatadás céljából kezeljük.</p>
+    <Button variant="industrial" type="submit" disabled={status === "sending"} className="h-11 px-6 text-xs sm:col-span-2 sm:justify-self-start">{status === "sending" ? "Küldés…" : "Ajánlatkérés elküldése"} <ArrowRight /></Button>
+  </form>;
+}
+
 function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [filter, setFilter] = useState("Összes");
