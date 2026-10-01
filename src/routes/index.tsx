@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useRef, useState, type ChangeEvent, type FormEvent } from "react";
-import { ArrowRight, ArrowDown, Menu, X, ShieldCheck, Settings, ScanLine, UsersRound, Fence, Factory, Ruler, Warehouse, Waypoints, PanelsTopLeft, MessageSquare, PencilRuler, Truck, Mail, Phone, MapPin, Upload, CheckCircle2, ImagePlus, X as XIcon } from "lucide-react";
+import { ArrowRight, ArrowDown, Menu, X, ShieldCheck, Settings, ScanLine, UsersRound, Fence, Factory, Ruler, Warehouse, Waypoints, PanelsTopLeft, MessageSquare, PencilRuler, Truck, Mail, Phone, MapPin, CheckCircle2, ImagePlus, X as XIcon } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { submitQuoteRequest } from "@/lib/quote.functions";
 import { Button } from "@/components/ui/button";
