@@ -35,6 +35,7 @@ export const submitQuoteRequest = createServerFn({ method: "POST" })
       throw new Error("Kérjük, adjon meg e-mail címet vagy telefonszámot.");
     }
     const photo = data.get("photo");
+    console.log("[quote-debug] photo entry:", photo?.constructor?.name, photo instanceof File ? photo.size : String(photo).slice(0, 50));
     const hasPhoto = photo instanceof File && photo.size > 0;
     return { ...parsed, photo: hasPhoto ? photo : null };
   })
