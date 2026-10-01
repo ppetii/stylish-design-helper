@@ -141,8 +141,8 @@ function QuoteForm() {
     <label className="grid gap-2 text-xs font-bold uppercase">E-mail<input name="email" type="email" maxLength={255} autoComplete="email" className={inputCls} placeholder="E-mail címe" /></label>
     <label className="grid gap-2 text-xs font-bold uppercase">Telefonszám<input name="phone" type="tel" maxLength={30} autoComplete="tel" className={inputCls} placeholder="Telefonszáma" /></label>
     <label className="grid gap-2 text-xs font-bold uppercase">Méretek<input name="dimensions" maxLength={200} className={inputCls} placeholder="pl. 400 × 200 cm" /></label>
-    <label className="grid gap-2 text-xs font-bold uppercase">Helyszín, település<input name="location" maxLength={200} className={inputCls} placeholder="pl. Debrecen" /></label>
-    <label className="grid gap-2 text-xs font-bold uppercase sm:col-span-2">Üzenet<textarea name="message" rows={4} maxLength={2000} className="resize-y border border-border bg-background p-3 font-sans text-sm font-normal normal-case outline-none focus:border-primary" placeholder="Meséljen a tervezett munkáról…" /></label>
+    <label className="grid gap-2 text-xs font-bold uppercase">Helyszín, település<input name="location" maxLength={200} className={inputCls} placeholder="pl. Budapest, XI. kerület" /></label>
+    <label className="grid gap-2 text-xs font-bold uppercase sm:col-span-2">Üzenet, a terv részletes leírása<textarea name="message" rows={6} maxLength={2000} className="resize-y border border-border bg-background p-3 font-sans text-sm font-normal normal-case outline-none focus:border-primary" placeholder="Írja le részletesen a tervet: milyen szerkezetet szeretne, anyag, stílus, színek, nyitásirány, határidő és minden fontos részlet…" /></label>
     <div className="grid gap-2 text-xs font-bold uppercase sm:col-span-2">Referenciafotó
       {photoPreview ? <div className="flex items-center gap-3 border border-border bg-muted/40 p-3">
         <img src={photoPreview} alt="Feltöltött referenciafotó előnézete" className="h-16 w-16 shrink-0 object-cover" />
