@@ -73,8 +73,18 @@ function QuoteForm() {
   }
 
   function removePhoto() {
-    if (formRef.current) formRef.current.photo.value = "";
+    const input = formRef.current?.elements.namedItem("photo") as HTMLInputElement | null;
+    if (input) input.value = "";
     setPhotoPreview(null); setPhotoName(null);
+  }
+
+  function setPhotoFile(file: File) {
+    const input = formRef.current?.elements.namedItem("photo") as HTMLInputElement | null;
+    if (!input) return;
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    input.files = dt.files;
+    handlePhotoChange({ target: input } as ChangeEvent<HTMLInputElement>);
   }
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
