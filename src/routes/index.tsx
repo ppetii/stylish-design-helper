@@ -128,12 +128,15 @@ function QuoteForm() {
         <img src={photoPreview} alt="Feltöltött referenciafotó előnézete" className="h-16 w-16 shrink-0 object-cover" />
         <p className="min-w-0 flex-1 truncate text-xs font-normal normal-case text-muted-foreground">{photoName}</p>
         <button type="button" onClick={removePhoto} aria-label="Fotó eltávolítása" className="text-muted-foreground hover:text-primary"><XIcon className="size-5" /></button>
-      </div> : <div className="flex items-center justify-center gap-2 border border-dashed border-border bg-muted/30 px-3 py-6 text-muted-foreground">
+      </div> : <div
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={(e) => { e.preventDefault(); const file = e.dataTransfer.files?.[0]; if (file) setPhotoFile(file); }}
+        className="flex flex-wrap items-center justify-center gap-2 border border-dashed border-border bg-muted/30 px-3 py-6 text-muted-foreground"
+      >
         <ImagePlus className="size-5 text-primary" />
         <p className="text-xs font-normal normal-case">Húzza ide a fotót, vagy</p>
         <label htmlFor="quote-photo" className="cursor-pointer text-xs font-bold normal-case text-primary underline underline-offset-2">válasszon fájlt</label>
         <input id="quote-photo" type="file" name="photo" accept="image/jpeg,image/png,image/webp" onChange={handlePhotoChange} className="sr-only" />
-        <Upload className="size-0" aria-hidden />
       </div>}
       <p className="text-[11px] font-normal normal-case text-muted-foreground">JPG, PNG vagy WEBP, legfeljebb 10 MB. Opcionális, de segít a pontos ajánlatban.</p>
     </div>
