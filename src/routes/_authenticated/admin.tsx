@@ -91,7 +91,7 @@ function AdminPage() {
               {[["all", "Összes"], ...Object.entries(STATUSES)].map(([k, l]) => {
                 const n = k === "all" ? listQ.data?.length ?? 0 : listQ.data?.filter((r) => r.status === k).length ?? 0;
                 return (
-                  <button key={k} onClick={() => setFilter(k)} className={`border px-3 py-1.5 text-xs font-bold uppercase ${filter === k ? "border-primary bg-primary text-primary-foreground" : "border-border bg-background"}`}>
+                  <button key={k} onClick={() => setFilter(k ?? "all")} className={`border px-3 py-1.5 text-xs font-bold uppercase ${filter === k ? "border-primary bg-primary text-primary-foreground" : "border-border bg-background"}`}>
                     {l} ({n})
                   </button>
                 );
