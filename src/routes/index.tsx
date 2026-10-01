@@ -95,6 +95,26 @@ function QuoteForm() {
       setError("Kérjük, adjon meg e-mail címet vagy telefonszámot.");
       return;
     }
+    const file = fd.get("photo");
+    if (file instanceof File && file.size > 0) {
+      if (file.size > 10 * 1024 * 1024) {
+        setError("A fotó mérete legfeljebb 10 MB lehet.");
+        return;
+      }
+      try {
+        const dataUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(String(reader.result));
+          reader.onerror = () => reject(new Error());
+          reader.readAsDataURL(file);
+        });
+        fd.set("photoBase64", dataUrl.split(",")[1] ?? "");
+        fd.set("photoType", file.type);
+      } catch {
+        setError("A fotó beolvasása nem sikerült. Kérjük, próbálja újra.");
+        return;
+      }
+    }
     setError(null);
     setStatus("sending");
     try {
