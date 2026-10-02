@@ -38,7 +38,7 @@ const tabs = [
   { id: "ipari", label: "Ipari munkáink" },
 ] as const;
 
-type GalleryImage = { id: string; category: string; storage_path: string; sort_order: number };
+type GalleryImage = { id: string; category: string; url: string; sort_order: number };
 
 async function fetchGallery(): Promise<GalleryImage[]> {
   try {
@@ -48,17 +48,14 @@ async function fetchGallery(): Promise<GalleryImage[]> {
       .order("sort_order", { ascending: true })
       .order("created_at", { ascending: true });
     if (error) throw error;
-    return (data ?? []) as GalleryImage[];
+    const rows = (data ?? []) as { id: string; category: string; storage_path: string; sort_order: number }[];
+    return await Promise.all(rows.map(async (img) => {
+      const { data: signed } = await supabase.storage.from("gallery").createSignedUrl(img.storage_path, 60 * 60 * 24 * 365);
+      return { id: img.id, category: img.category, sort_order: img.sort_order, url: signed?.signedUrl ?? "" };
+    }));
   } catch {
     return [];
   }
-}
-
-function useGalleryUrls(images: GalleryImage[] | undefined) {
-  return (images ?? []).map((img) => {
-    const { data } = supabase.storage.from("gallery").createSignedUrl(img.storage_path, 60 * 60 * 24 * 365);
-    return { ...img, url: data?.signedUrl ?? "" };
-  }).filter((img) => img.url);
 }
 
 function Brand() {
