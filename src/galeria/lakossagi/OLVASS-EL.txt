@@ -1,0 +1,1 @@
+Ide töltse fel a képeket (jpg, jpeg, png, webp). Fájlnév szerinti sorrendben jelennek meg.

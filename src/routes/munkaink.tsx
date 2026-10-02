@@ -1,9 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { ArrowRight, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
 import emblem from "@/assets/Vasmester.png.asset.json";
 
 export const Route = createFileRoute("/munkaink")({
@@ -38,25 +36,9 @@ const tabs = [
   { id: "ipari", label: "Ipari munkáink" },
 ] as const;
 
-type GalleryImage = { id: string; category: string; url: string; sort_order: number };
-
-async function fetchGallery(): Promise<GalleryImage[]> {
-  try {
-    const { data, error } = await supabase
-      .from("gallery_images")
-      .select("id, category, storage_path, sort_order")
-      .order("sort_order", { ascending: true })
-      .order("created_at", { ascending: true });
-    if (error) throw error;
-    const rows = (data ?? []) as { id: string; category: string; storage_path: string; sort_order: number }[];
-    return await Promise.all(rows.map(async (img) => {
-      const { data: signed } = await supabase.storage.from("gallery").createSignedUrl(img.storage_path, 60 * 60 * 24 * 365);
-      return { id: img.id, category: img.category, sort_order: img.sort_order, url: signed?.signedUrl ?? "" };
-    }));
-  } catch {
-    return [];
-  }
-}
+// Képek a src/galeria/<kategória>/ mappákból — új kép feltöltése (pl. GitHubon) után a következő buildnél megjelenik.
+const files = import.meta.glob("/src/galeria/*/*.{jpg,jpeg,png,webp,JPG,JPEG,PNG,WEBP}", { eager: true, import: "default" }) as Record<string, string>;
+const all = Object.keys(files).sort().map((path) => ({ id: path, category: path.split("/")[3], url: files[path] }));
 
 function Brand() {
   return <Link to="/" className="flex shrink-0 items-center gap-2.5 text-hero-foreground" aria-label="Vasmester és Fiai – Kezdőlap">
@@ -68,8 +50,6 @@ function Brand() {
 function Works() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [tab, setTab] = useState<string>("lakossagi");
-  const galleryQ = useQuery({ queryKey: ["gallery"], queryFn: fetchGallery, staleTime: 60_000 });
-  const all = (galleryQ.data ?? []).filter((img) => img.url);
   const active = tabs.find((t) => t.id === tab) ?? tabs[0];
   const items = all.filter((img) => img.category === active.id);
 
