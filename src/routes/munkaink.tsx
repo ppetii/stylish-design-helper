@@ -1,14 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { ArrowRight, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 import emblem from "@/assets/Vasmester.png.asset.json";
-import gate from "@/assets/steel-gate.jpg";
-import stairs from "@/assets/steel-stairs.jpg";
-import canopy from "@/assets/steel-canopy.jpg";
-import structure from "@/assets/steel-structure.jpg";
-import hero from "@/assets/welding-hero.jpg";
-import custom from "@/assets/custom-metal.jpg";
 
 export const Route = createFileRoute("/munkaink")({
   head: () => ({ meta: [
@@ -38,25 +34,32 @@ function NavLink({ item, className, onClick }: { item: NavItem; className: strin
 }
 
 const tabs = [
-  {
-    id: "lakossagi",
-    label: "Lakossági munkáink",
-    items: [
-      { title: "Kapuk és kerítések", img: gate, desc: "Egyedi méretre tervezett és gyártott kapuk, kerítések és nyílókapuk családi házakhoz és társasházakhoz. Modern vagy klasszikus stílusban, korrózióvédett felületkezeléssel, hogy évtizedekig megállja a helyét." },
-      { title: "Lépcsők és korlátok", img: stairs, desc: "Beltéri és kültéri lépcsők, korlátok és rácsok, amelyek egyszerre biztonságosak és esztétikusak. Acél, festett vagy rozsdamentes kivitelben, az otthon karakteréhez igazítva." },
-      { title: "Előtetők", img: canopy, desc: "Bejáratokat és teraszokat védő acél előtetők. Tartós szerkezet, igényes megjelenés – az eső és a hó elleni védelem, ami évekig gond nélkül működik." },
-    ],
-  },
-  {
-    id: "ipari",
-    label: "Ipari munkáink",
-    items: [
-      { title: "Acélszerkezetek", img: structure, desc: "Teherhordó acélvázak, csarnokok, platformok és tartószerkezetek gyártása és szerelése. Méretezve, gondosan dokumentálva, a megbeszélt határidőre." },
-      { title: "Hegesztési munkák", img: hero, desc: "MIG/MAG, TIG és bevontelektródás hegesztés, szerkezeti és javítási munkák – a műhelyben és a helyszínen egyaránt, ellenőrzött minőségben." },
-      { title: "Egyedi fémszerkezetek", img: custom, desc: "Ami máshol nem fér bele: egyedi méret, különleges forma, összetett műszaki megoldás. Az Ön rajzai vagy ötletei alapján, a tervezéstől az átadásig." },
-    ],
-  },
+  { id: "lakossagi", label: "Lakossági munkáink" },
+  { id: "ipari", label: "Ipari munkáink" },
 ] as const;
+
+type GalleryImage = { id: string; category: string; storage_path: string; sort_order: number };
+
+async function fetchGallery(): Promise<GalleryImage[]> {
+  try {
+    const { data, error } = await supabase
+      .from("gallery_images")
+      .select("id, category, storage_path, sort_order")
+      .order("sort_order", { ascending: true })
+      .order("created_at", { ascending: true });
+    if (error) throw error;
+    return (data ?? []) as GalleryImage[];
+  } catch {
+    return [];
+  }
+}
+
+function useGalleryUrls(images: GalleryImage[] | undefined) {
+  return (images ?? []).map((img) => {
+    const { data } = supabase.storage.from("gallery").createSignedUrl(img.storage_path, 60 * 60 * 24 * 365);
+    return { ...img, url: data?.signedUrl ?? "" };
+  }).filter((img) => img.url);
+}
 
 function Brand() {
   return <Link to="/" className="flex shrink-0 items-center gap-2.5 text-hero-foreground" aria-label="Vasmester és Fiai – Kezdőlap">
@@ -68,7 +71,11 @@ function Brand() {
 function Works() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [tab, setTab] = useState<string>("lakossagi");
+  const galleryQ = useQuery({ queryKey: ["gallery"], queryFn: fetchGallery, staleTime: 60_000 });
+  const all = useGalleryUrls(galleryQ.data);
   const active = tabs.find((t) => t.id === tab) ?? tabs[0];
+  const items = all.filter((img) => img.category === active.id);
+
   return <div className="overflow-x-hidden">
     <header className="sticky top-0 z-50 bg-ink text-hero-foreground shadow-lg">
       <div className="mx-auto flex h-[72px] max-w-[1440px] items-center justify-between gap-4 px-5 md:px-10 lg:px-14">
@@ -92,15 +99,15 @@ function Works() {
         <div role="tablist" aria-label="Munkák kategóriái" className="mb-8 flex gap-7 border-b border-steel text-xs font-semibold [scrollbar-width:none]">
           {tabs.map((t) => <Button key={t.id} variant="ghost" role="tab" aria-selected={tab === t.id} onClick={() => setTab(t.id)} className={`h-10 rounded-none border-b-2 px-0 text-xs hover:bg-transparent hover:text-hero-foreground ${tab === t.id ? "border-primary text-hero-foreground" : "border-transparent text-ink-muted"}`}>{t.label}</Button>)}
         </div>
-        <div key={active.id} className="grid gap-10 md:grid-cols-3 md:gap-6 lg:gap-8">
-          {active.items.map(({ title, img, desc }) => <article key={title} className="min-w-0">
-            <div className="aspect-[4/3] overflow-hidden bg-steel"><img src={img} alt={title} loading="lazy" width={1024} height={768} className="h-full w-full object-cover" /></div>
-            <h2 className="mt-5 font-display text-2xl font-bold">{title}</h2>
-            <div className="red-rule mt-3" />
-            <p className="mt-4 text-sm leading-7 text-hero-muted">{desc}</p>
-          </article>)}
-        </div>
-        <p className="mt-8 text-xs text-ink-muted">A képek látványillusztrációk.</p>
+        {items.length === 0 ? (
+          <p className="text-sm text-hero-muted">Hamarosan feltöltjük ezt a galériát.</p>
+        ) : (
+          <div key={active.id} className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {items.map((img) => <div key={img.id} className="aspect-[4/3] overflow-hidden bg-steel">
+              <img src={img.url} alt="Vasmester és Fiai munkája" loading="lazy" className="h-full w-full object-cover transition-transform duration-500 hover:scale-105" />
+            </div>)}
+          </div>
+        )}
       </div></section>
 
       <section className="relative isolate bg-steel py-14 text-hero-foreground"><div className="mx-auto flex max-w-[1440px] flex-col justify-between gap-6 px-5 md:flex-row md:items-center md:px-10 lg:px-14"><div><p className="text-xs font-bold uppercase text-primary">Tetszik, amit lát?</p><h2 className="section-title mt-2 text-4xl sm:text-5xl">Készítsünk hasonlót Önnek!</h2><p className="mt-3 text-sm text-hero-muted">Írja meg az elképzelését, és egyedi ajánlatot készítünk.</p></div><Button variant="industrial" size="lg" asChild className="h-12 shrink-0 px-7 text-xs"><Link to="/" hash="kapcsolat">Ajánlatkérés <ArrowRight /></Link></Button></div></section>
