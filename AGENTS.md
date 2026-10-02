@@ -9,7 +9,7 @@
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
 
-- Keep this business website as a single anchored home page; its navigation, filters, and quote form are client-side interactions so visitors can browse without account setup.
+- Home page stays a single anchored page (client-side nav, filters, quote form, no account setup). The "Kiemelt munkáink" gallery lives on its own route `/munkaink` with Lakossági/Ipari tabs; home nav and hero link there via `/munkaink`.
 
 ## Quote form
 - Az ajánlatkérések a `quote_requests` táblába íródnak service_role-lal (RLS nincs nyitva); a referenciafotók a privát `quote-photos` bucket `requests/` útvonal alá kerülnek.
