@@ -22,13 +22,20 @@ export const Route = createFileRoute("/munkaink")({
   component: Works,
 });
 
-const nav: { label: string; to: "/" | "/munkaink"; hash?: string }[] = [
-  { label: "Kezdőlap", to: "/" },
-  { label: "Szolgáltatások", to: "/", hash: "szolgaltatasok" },
-  { label: "Munkáink", to: "/munkaink" },
-  { label: "Rólunk", to: "/", hash: "rolunk" },
-  { label: "Kapcsolat", to: "/", hash: "kapcsolat" },
+const nav = [
+  { label: "Kezdőlap", to: "/" as const },
+  { label: "Szolgáltatások", to: "/" as const, hash: "szolgaltatasok" },
+  { label: "Munkáink", to: "/munkaink" as const },
+  { label: "Rólunk", to: "/" as const, hash: "rolunk" },
+  { label: "Kapcsolat", to: "/" as const, hash: "kapcsolat" },
 ];
+
+type NavItem = (typeof nav)[number];
+
+function NavLink({ item, className, onClick }: { item: NavItem; className: string; onClick?: () => void }) {
+  if (item.hash) return <Link to={item.to} hash={item.hash} onClick={onClick} className={className}>{item.label}</Link>;
+  return <Link to={item.to} onClick={onClick} className={className}>{item.label}</Link>;
+}
 
 const tabs = [
   {
@@ -49,7 +56,7 @@ const tabs = [
       { title: "Egyedi fémszerkezetek", img: custom, desc: "Ami máshol nem fér bele: egyedi méret, különleges forma, összetett műszaki megoldás. Az Ön rajzai vagy ötletei alapján, a tervezéstől az átadásig." },
     ],
   },
-];
+] as const;
 
 function Brand() {
   return <Link to="/" className="flex shrink-0 items-center gap-2.5 text-hero-foreground" aria-label="Vasmester és Fiai – Kezdőlap">
@@ -60,17 +67,17 @@ function Brand() {
 
 function Works() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [tab, setTab] = useState(tabs[0].id);
+  const [tab, setTab] = useState<string>("lakossagi");
   const active = tabs.find((t) => t.id === tab) ?? tabs[0];
   return <div className="overflow-x-hidden">
     <header className="sticky top-0 z-50 bg-ink text-hero-foreground shadow-lg">
       <div className="mx-auto flex h-[72px] max-w-[1440px] items-center justify-between gap-4 px-5 md:px-10 lg:px-14">
         <Brand />
-        <nav className="hidden items-center gap-6 lg:flex xl:gap-9" aria-label="Fő navigáció">{nav.map((item) => <Link key={item.label} to={item.to} hash={item.hash} className="text-xs font-bold transition-colors hover:text-primary">{item.label}</Link>)}</nav>
+        <nav className="hidden items-center gap-6 lg:flex xl:gap-9" aria-label="Fő navigáció">{nav.map((item) => <NavLink key={item.label} item={item} className="text-xs font-bold transition-colors hover:text-primary" />)}</nav>
         <Button variant="industrial" size="lg" asChild className="hidden h-10 px-5 text-xs lg:inline-flex"><Link to="/" hash="kapcsolat">Ajánlatkérés <ArrowRight /></Link></Button>
         <Button variant="ghost" size="icon" className="text-hero-foreground lg:hidden" onClick={() => setMenuOpen(!menuOpen)} aria-label={menuOpen ? "Menü bezárása" : "Menü megnyitása"} aria-expanded={menuOpen}>{menuOpen ? <X /> : <Menu />}</Button>
       </div>
-      {menuOpen && <nav className="flex flex-col border-t border-steel px-5 py-3 lg:hidden" aria-label="Mobil navigáció">{nav.map((item) => <Link key={item.label} to={item.to} hash={item.hash} onClick={() => setMenuOpen(false)} className="border-b border-steel py-3 text-sm font-semibold">{item.label}</Link>)}<Link to="/" hash="kapcsolat" onClick={() => setMenuOpen(false)} className="py-3 font-bold uppercase text-primary">Ajánlatkérés →</Link></nav>}
+      {menuOpen && <nav className="flex flex-col border-t border-steel px-5 py-3 lg:hidden" aria-label="Mobil navigáció">{nav.map((item) => <NavLink key={item.label} item={item} onClick={() => setMenuOpen(false)} className="border-b border-steel py-3 text-sm font-semibold" />)}<Link to="/" hash="kapcsolat" onClick={() => setMenuOpen(false)} className="py-3 font-bold uppercase text-primary">Ajánlatkérés →</Link></nav>}
     </header>
 
     <main>
@@ -99,6 +106,6 @@ function Works() {
       <section className="relative isolate bg-steel py-14 text-hero-foreground"><div className="mx-auto flex max-w-[1440px] flex-col justify-between gap-6 px-5 md:flex-row md:items-center md:px-10 lg:px-14"><div><p className="text-xs font-bold uppercase text-primary">Tetszik, amit lát?</p><h2 className="section-title mt-2 text-4xl sm:text-5xl">Készítsünk hasonlót Önnek!</h2><p className="mt-3 text-sm text-hero-muted">Írja meg az elképzelését, és egyedi ajánlatot készítünk.</p></div><Button variant="industrial" size="lg" asChild className="h-12 shrink-0 px-7 text-xs"><Link to="/" hash="kapcsolat">Ajánlatkérés <ArrowRight /></Link></Button></div></section>
     </main>
 
-    <footer className="bg-ink text-hero-foreground"><div className="mx-auto flex max-w-[1440px] flex-col justify-between gap-8 px-5 py-10 md:flex-row md:items-center md:px-10 lg:px-14"><Brand /><nav aria-label="Lábléc navigáció" className="flex flex-wrap gap-x-5 gap-y-3 text-xs text-hero-muted">{nav.map((item) => <Link to={item.to} hash={item.hash} key={item.label} className="hover:text-hero-foreground">{item.label}</Link>)}</nav></div><div className="mx-auto max-w-[1440px] border-t border-steel px-5 py-5 text-xs text-ink-muted md:px-10 lg:px-14">© {new Date().getFullYear()} Vasmester és Fiai Kft. Minden jog fenntartva.</div></footer>
+    <footer className="bg-ink text-hero-foreground"><div className="mx-auto flex max-w-[1440px] flex-col justify-between gap-8 px-5 py-10 md:flex-row md:items-center md:px-10 lg:px-14"><Brand /><nav aria-label="Lábléc navigáció" className="flex flex-wrap gap-x-5 gap-y-3 text-xs text-hero-muted">{nav.map((item) => <NavLink key={item.label} item={item} className="hover:text-hero-foreground" />)}</nav></div><div className="mx-auto max-w-[1440px] border-t border-steel px-5 py-5 text-xs text-ink-muted md:px-10 lg:px-14">© {new Date().getFullYear()} Vasmester és Fiai Kft. Minden jog fenntartva.</div></footer>
   </div>;
 }
