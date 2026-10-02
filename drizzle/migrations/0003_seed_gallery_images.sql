@@ -1,0 +1,1 @@
+insert into public.gallery_images (category, storage_path, sort_order) values ('lakossagi', 'lakossagi/kapuk-keritesek.jpg', 1), ('lakossagi', 'lakossagi/lepcsek-korlatok.jpg', 2), ('lakossagi', 'lakossagi/elotetok.jpg', 3), ('ipari', 'ipari/acelszerkezetek.jpg', 1), ('ipari', 'ipari/hegesztesi-munkak.jpg', 2), ('ipari', 'ipari/egyedi-femszerkezetek.jpg', 3);

@@ -15,6 +15,20 @@
       "when": 1790884934893,
       "tag": "0001_admin_roles_and_status",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790953537330,
+      "tag": "0002_create_gallery_images",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1790953581731,
+      "tag": "0003_seed_gallery_images",
+      "breakpoints": true
     }
   ]
 }
