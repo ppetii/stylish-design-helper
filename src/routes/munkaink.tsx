@@ -69,7 +69,7 @@ function Works() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [tab, setTab] = useState<string>("lakossagi");
   const galleryQ = useQuery({ queryKey: ["gallery"], queryFn: fetchGallery, staleTime: 60_000 });
-  const all = useGalleryUrls(galleryQ.data);
+  const all = (galleryQ.data ?? []).filter((img) => img.url);
   const active = tabs.find((t) => t.id === tab) ?? tabs[0];
   const items = all.filter((img) => img.category === active.id);
 
