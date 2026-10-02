@@ -14,5 +14,5 @@
 ## Quote form
 - Az ajánlatkérések a `quote_requests` táblába íródnak service_role-lal (RLS nincs nyitva); a referenciafotók a privát `quote-photos` bucket `requests/` útvonal alá kerülnek.
 - A fotó a szerverfüggvényen base64 kódolással utazik (a File objektum nem él át az RPC-n), JPEG/PNG/WEBP, max 10 MB.
-- A telefonszám (+36 30 123 4567) és e-mail (info@vasmesteresfiai.hu) placeholder — megerősítendő.
+- Official contact data and company details are hardcoded in the home page sections (contact, footer imprint).
 - Admin access is granted via the user_roles table (first signed-up user becomes admin by trigger); /admin lives under the _authenticated gate and reads quotes with RLS — keeps privileges server-verified.
