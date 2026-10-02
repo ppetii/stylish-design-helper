@@ -22,6 +22,13 @@
       "when": 1790953537330,
       "tag": "0002_create_gallery_images",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1790953581731,
+      "tag": "0003_seed_gallery_images",
+      "breakpoints": true
     }
   ]
 }
