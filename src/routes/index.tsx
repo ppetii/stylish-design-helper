@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import emblem from "@/assets/Vasmester.png.asset.json";
 import hero from "@/assets/welding-hero.jpg";
 import gate from "@/assets/steel-gate.jpg";
-import fence from "@/assets/steel-fence.jpg";
 import structure from "@/assets/steel-structure.jpg";
 import stairs from "@/assets/steel-stairs.jpg";
 import canopy from "@/assets/steel-canopy.jpg";
@@ -25,7 +24,7 @@ export const Route = createFileRoute("/")({
   component: Home,
 });
 
-const nav = [["Kezdőlap", "#kezdolap"], ["Szolgáltatások", "#szolgaltatasok"], ["Munkáink", "#munkaink"], ["Rólunk", "#rolunk"], ["Kapcsolat", "#kapcsolat"]];
+const nav = [["Kezdőlap", "#kezdolap"], ["Szolgáltatások", "#szolgaltatasok"], ["Munkáink", "/munkaink"], ["Rólunk", "#rolunk"], ["Kapcsolat", "#kapcsolat"]];
 const services = [
   { title: "Kapuk és kerítések", desc: "Egyedi tervezés, gyártás és szerelés", img: gate, Icon: Fence },
   { title: "Acélszerkezetek", desc: "Ipari és lakossági projektekhez", img: structure, Icon: Factory },
@@ -34,15 +33,6 @@ const services = [
   { title: "Hegesztési munkák", desc: "MIG/MAG, TIG, bevontelektródás", img: hero, Icon: Waypoints },
   { title: "Egyedi fémszerkezetek", desc: "Az Ön elképzelései alapján", img: custom, Icon: PanelsTopLeft },
 ];
-const projects = [
-  { title: "Modern kapu", category: "Kapuk", img: gate },
-  { title: "Beltéri lépcső", category: "Lépcsők", img: stairs },
-  { title: "Acél előtető", category: "Előtetők", img: canopy },
-  { title: "Egyedi kerítés", category: "Kerítések", img: fence },
-  { title: "Acélváz", category: "Acélszerkezetek", img: structure },
-  { title: "Egyedi fémmunka", category: "Egyedi munkák", img: custom },
-];
-const filters = ["Összes", "Kapuk", "Kerítések", "Lépcsők", "Előtetők", "Acélszerkezetek", "Egyedi munkák"];
 const projectTypes = ["Kapu vagy kerítés", "Acélszerkezet", "Lépcső vagy korlát", "Előtető", "Hegesztési munka", "Egyedi fémszerkezet", "Egyéb"];
 
 function Brand() {
@@ -167,8 +157,6 @@ function QuoteForm() {
 
 function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [filter, setFilter] = useState("Összes");
-  const visible = filter === "Összes" ? projects : projects.filter((project) => project.category === filter);
   return <div className="overflow-x-hidden">
     <header className="sticky top-0 z-50 bg-ink text-hero-foreground shadow-lg">
       <div className="mx-auto flex h-[72px] max-w-[1440px] items-center justify-between gap-4 px-5 md:px-10 lg:px-14">
@@ -189,7 +177,7 @@ function Home() {
             <p className="mb-5 text-xs font-bold uppercase text-primary sm:text-sm">Fémben a tapasztalat, generációk óta.</p>
             <h1 className="font-display text-[clamp(4rem,7vw,7.25rem)] font-extrabold uppercase leading-[0.95]"><span className="block text-primary">Vasmester</span><span className="mt-2 block">és Fiai</span></h1>
             <p className="mt-7 max-w-lg text-base leading-relaxed text-hero-muted sm:text-lg">Egyedi fémszerkezetek, lakatos munkák és komplett acélszerkezetek – a tervezéstől a kivitelezésig.</p>
-            <div className="mt-8 flex flex-wrap gap-3"><Button variant="industrial" size="lg" asChild className="h-12 px-6 text-xs"><a href="#kapcsolat">Ajánlatkérés <ArrowRight /></a></Button><Button variant="industrialOutline" size="lg" asChild className="h-12 px-6 text-xs"><a href="#munkaink">Munkáink megtekintése</a></Button></div>
+            <div className="mt-8 flex flex-wrap gap-3"><Button variant="industrial" size="lg" asChild className="h-12 px-6 text-xs"><a href="#kapcsolat">Ajánlatkérés <ArrowRight /></a></Button><Button variant="industrialOutline" size="lg" asChild className="h-12 px-6 text-xs"><a href="/munkaink">Munkáink megtekintése</a></Button></div>
           </div>
           <div className="hidden justify-self-end lg:block">
             <ul className="space-y-5 text-[11px] font-bold uppercase">{[[ShieldCheck,"Megbízhatóság"],[Settings,"Precíz munkavégzés"],[ScanLine,"Egyedi megoldások"],[UsersRound,"Generációs tapasztalat"]].map(([Icon,label]) => { const Symbol = Icon as typeof ShieldCheck; return <li key={label as string} className="flex items-center gap-4"><Symbol className="size-6 text-hero-foreground" strokeWidth={1.6}/>{label as string}</li> })}</ul>
