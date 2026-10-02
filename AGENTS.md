@@ -10,7 +10,7 @@
 <!-- LOVABLE:END -->
 
 - Home page stays a single anchored page (client-side nav, filters, quote form, no account setup). The "Kiemelt munkáink" gallery lives on its own route `/munkaink` with Lakossági/Ipari tabs; home nav and hero link there via `/munkaink`.
-- The `/munkaink` gallery is fully DB-driven from `public.gallery_images` (category lakossagi|ipari, storage_path in the private `gallery` bucket, served via long-lived signed URLs; anon SELECT open, admin INSERT/DELETE via has_role). Images have NO titles or descriptions on the page. Upload/delete happens in the admin UI's "Galéria kezelése" section; public buckets are blocked by workspace policy, keep the bucket private.
+- The `/munkaink` gallery reads image files from `src/galeria/<category>/` via `import.meta.glob`, sorted by filename — owner uploads images through GitHub, no backend needed. Images have NO titles or descriptions.
 
 ## Quote form
 - Az ajánlatkérések a `quote_requests` táblába íródnak service_role-lal (RLS nincs nyitva); a referenciafotók a privát `quote-photos` bucket `requests/` útvonal alá kerülnek.
