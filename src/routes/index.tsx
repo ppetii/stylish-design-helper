@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import emblem from "@/assets/Vasmester.png.asset.json";
 import hero from "@/assets/welding-hero.jpg";
 import gate from "@/assets/steel-gate.jpg";
-import fence from "@/assets/steel-fence.jpg";
 import structure from "@/assets/steel-structure.jpg";
 import stairs from "@/assets/steel-stairs.jpg";
 import canopy from "@/assets/steel-canopy.jpg";
@@ -25,7 +24,7 @@ export const Route = createFileRoute("/")({
   component: Home,
 });
 
-const nav = [["Kezdőlap", "#kezdolap"], ["Szolgáltatások", "#szolgaltatasok"], ["Munkáink", "#munkaink"], ["Rólunk", "#rolunk"], ["Kapcsolat", "#kapcsolat"]];
+const nav = [["Kezdőlap", "#kezdolap"], ["Szolgáltatások", "#szolgaltatasok"], ["Munkáink", "/munkaink"], ["Rólunk", "#rolunk"], ["Kapcsolat", "#kapcsolat"]];
 const services = [
   { title: "Kapuk és kerítések", desc: "Egyedi tervezés, gyártás és szerelés", img: gate, Icon: Fence },
   { title: "Acélszerkezetek", desc: "Ipari és lakossági projektekhez", img: structure, Icon: Factory },
@@ -34,15 +33,6 @@ const services = [
   { title: "Hegesztési munkák", desc: "MIG/MAG, TIG, bevontelektródás", img: hero, Icon: Waypoints },
   { title: "Egyedi fémszerkezetek", desc: "Az Ön elképzelései alapján", img: custom, Icon: PanelsTopLeft },
 ];
-const projects = [
-  { title: "Modern kapu", category: "Kapuk", img: gate },
-  { title: "Beltéri lépcső", category: "Lépcsők", img: stairs },
-  { title: "Acél előtető", category: "Előtetők", img: canopy },
-  { title: "Egyedi kerítés", category: "Kerítések", img: fence },
-  { title: "Acélváz", category: "Acélszerkezetek", img: structure },
-  { title: "Egyedi fémmunka", category: "Egyedi munkák", img: custom },
-];
-const filters = ["Összes", "Kapuk", "Kerítések", "Lépcsők", "Előtetők", "Acélszerkezetek", "Egyedi munkák"];
 const projectTypes = ["Kapu vagy kerítés", "Acélszerkezet", "Lépcső vagy korlát", "Előtető", "Hegesztési munka", "Egyedi fémszerkezet", "Egyéb"];
 
 function Brand() {
@@ -167,8 +157,6 @@ function QuoteForm() {
 
 function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [filter, setFilter] = useState("Összes");
-  const visible = filter === "Összes" ? projects : projects.filter((project) => project.category === filter);
   return <div className="overflow-x-hidden">
     <header className="sticky top-0 z-50 bg-ink text-hero-foreground shadow-lg">
       <div className="mx-auto flex h-[72px] max-w-[1440px] items-center justify-between gap-4 px-5 md:px-10 lg:px-14">
@@ -189,7 +177,7 @@ function Home() {
             <p className="mb-5 text-xs font-bold uppercase text-primary sm:text-sm">Fémben a tapasztalat, generációk óta.</p>
             <h1 className="font-display text-[clamp(4rem,7vw,7.25rem)] font-extrabold uppercase leading-[0.95]"><span className="block text-primary">Vasmester</span><span className="mt-2 block">és Fiai</span></h1>
             <p className="mt-7 max-w-lg text-base leading-relaxed text-hero-muted sm:text-lg">Egyedi fémszerkezetek, lakatos munkák és komplett acélszerkezetek – a tervezéstől a kivitelezésig.</p>
-            <div className="mt-8 flex flex-wrap gap-3"><Button variant="industrial" size="lg" asChild className="h-12 px-6 text-xs"><a href="#kapcsolat">Ajánlatkérés <ArrowRight /></a></Button><Button variant="industrialOutline" size="lg" asChild className="h-12 px-6 text-xs"><a href="#munkaink">Munkáink megtekintése</a></Button></div>
+            <div className="mt-8 flex flex-wrap gap-3"><Button variant="industrial" size="lg" asChild className="h-12 px-6 text-xs"><a href="#kapcsolat">Ajánlatkérés <ArrowRight /></a></Button><Button variant="industrialOutline" size="lg" asChild className="h-12 px-6 text-xs"><a href="/munkaink">Munkáink megtekintése</a></Button></div>
           </div>
           <div className="hidden justify-self-end lg:block">
             <ul className="space-y-5 text-[11px] font-bold uppercase">{[[ShieldCheck,"Megbízhatóság"],[Settings,"Precíz munkavégzés"],[ScanLine,"Egyedi megoldások"],[UsersRound,"Generációs tapasztalat"]].map(([Icon,label]) => { const Symbol = Icon as typeof ShieldCheck; return <li key={label as string} className="flex items-center gap-4"><Symbol className="size-6 text-hero-foreground" strokeWidth={1.6}/>{label as string}</li> })}</ul>
@@ -206,11 +194,6 @@ function Home() {
         </div>
       </section>
 
-      <section id="munkaink" className="scroll-mt-20 bg-ink py-14 text-hero-foreground md:py-20"><div className="mx-auto max-w-[1440px] px-5 md:px-10 lg:px-14"><div className="mb-7 flex items-end justify-between gap-4"><div><h2 className="section-title text-4xl sm:text-5xl">Kiemelt <span className="text-primary">munkáink</span></h2><div className="red-rule mt-3" /></div><a href="#kapcsolat" className="hidden items-center gap-2 text-xs font-bold uppercase text-primary sm:flex">Saját projektet tervez? <ArrowRight className="size-4" /></a></div>
-        <div className="mb-5 flex gap-7 overflow-x-auto border-b border-steel text-xs font-semibold [scrollbar-width:none]">{filters.map((item) => <Button key={item} variant="ghost" onClick={() => setFilter(item)} className={`h-10 shrink-0 rounded-none border-b-2 px-0 text-xs hover:bg-transparent hover:text-hero-foreground ${filter === item ? "border-primary text-hero-foreground" : "border-transparent text-ink-muted"}`}>{item}</Button>)}</div>
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">{visible.map((project) => <div key={project.title} className="group relative aspect-[1.06] overflow-hidden bg-steel"><img src={project.img} alt={project.title} loading="lazy" width={1024} height={768} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" /><div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink/90 to-transparent p-3 pt-12"><p className="font-display text-xl font-bold">{project.title}</p><p className="text-[10px] uppercase text-hero-muted">{project.category}</p></div></div>)}</div>
-        <p className="mt-4 text-xs text-ink-muted">A képek látványillusztrációk.</p>
-      </div></section>
 
       <section id="rolunk" className="scroll-mt-20 bg-background"><div className="mx-auto w-full max-w-3xl px-5 py-16 md:px-10 lg:py-24"><h2 className="section-title text-4xl sm:text-5xl">Rólunk</h2><div className="red-rule mt-3 mb-7" /><div className="space-y-4 text-sm leading-7 text-muted-foreground sm:text-base"><p className="font-display text-2xl font-bold leading-tight text-foreground">Nem csak fémet formálunk. Évtizedek tapasztalatát visszük tovább.</p><p>A Vasmester és Fiai Kft. egy családi szemléletű, fémipari vállalkozás, ahol a szakmai tapasztalat, a precíz kivitelezés és a modern megoldások találkoznak.</p><p>Számunkra a fém nem egyszerű alapanyag. Egy jól megtervezett szerkezet hosszú évekre készül – legyen szó egy elegáns kapuról, egy tartós kerítésről, egy lépcsőről, előtetőről vagy akár egy komplett acélszerkezetről.</p><p className="font-display text-xl font-bold text-foreground">A nevünket adjuk a munkánkhoz.</p><p>Minden projektet az első egyeztetéstől a tervezésen és gyártáson át egészen a helyszíni szerelésig figyelemmel kísérünk. Hiszünk abban, hogy a jó munka nem a műhelyben kezdődik, hanem azzal, hogy pontosan megértjük, mit szeretne az ügyfél.</p><p>Az egyedi elképzeléseket nem problémának, hanem feladatnak tekintjük. Legyen szó különleges méretről, egyedi formáról vagy összetett műszaki megoldásról, célunk, hogy az elképzelésből olyan szerkezet szülessen, amely esztétikus, funkcionális és hosszú távon is megbízható.</p><p className="font-display text-xl font-bold text-foreground">Hagyományból építkezünk, de előre tekintünk.</p><p>A Vasmester és Fiai név számunkra a szakma iránti tiszteletet és a továbbadott tudást jelenti. Amit korábban tapasztalatból tanultunk, azt ma korszerű technológiákkal, pontosabb tervezéssel és folyamatosan fejlődő megoldásokkal ötvözzük.</p><p className="border-l-2 border-primary pl-4 italic text-foreground">Mert hisszük, hogy egy jó szerkezet nem attól lesz értékes, hogy elkészül.<br />Hanem attól, hogy évek múlva is megállja a helyét.</p><p className="text-xs font-bold uppercase text-primary">Vasmester és Fiai – Fémipari megoldások a tervezéstől a megvalósításig.</p></div><Button variant="industrial" size="lg" asChild className="mt-8 h-11 px-6 text-xs"><a href="#kapcsolat">Beszéljünk a tervéről <ArrowRight /></a></Button></div></section>
 
