@@ -129,7 +129,101 @@ function AdminPage() {
             </div>
           </>
         )}
+
+        {roleQ.data === true && <GalleryManager />}
       </main>
     </div>
+  );
+}
+
+function GalleryManager() {
+  const qc = useQueryClient();
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [category, setCategory] = useState<"lakossagi" | "ipari">("lakossagi");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+
+  const galleryQ = useQuery({
+    queryKey: ["gallery"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("gallery_images")
+        .select("id, category, storage_path, sort_order, created_at")
+        .order("category", { ascending: true })
+        .order("sort_order", { ascending: true })
+        .order("created_at", { ascending: true });
+      if (error) throw error;
+      const rows = data ?? [];
+      return await Promise.all(rows.map(async (img) => {
+        const { data: signed } = await supabase.storage.from("gallery").createSignedUrl(img.storage_path, 3600);
+        return { ...img, url: signed?.signedUrl ?? "" };
+      }));
+    },
+  });
+
+  async function upload(file: File) {
+    setError("");
+    setBusy(true);
+    try {
+      const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+      const path = `${category}/${crypto.randomUUID()}.${ext}`;
+      const { error: upErr } = await supabase.storage.from("gallery").upload(path, file, { contentType: file.type });
+      if (upErr) throw upErr;
+      const { data: existing } = await supabase.from("gallery_images").select("sort_order").eq("category", category);
+      const nextOrder = Math.max(0, ...(existing ?? []).map((r) => r.sort_order)) + 1;
+      const { error: insErr } = await supabase.from("gallery_images").insert({ category, storage_path: path, sort_order: nextOrder });
+      if (insErr) throw insErr;
+      qc.invalidateQueries({ queryKey: ["gallery"] });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "A feltöltés nem sikerült.");
+    } finally {
+      setBusy(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  }
+
+  async function remove(id: string, path: string) {
+    setError("");
+    setBusy(true);
+    try {
+      await supabase.storage.from("gallery").remove([path]);
+      await supabase.from("gallery_images").delete().eq("id", id);
+      qc.invalidateQueries({ queryKey: ["gallery"] });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "A törlés nem sikerült.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  const rows = galleryQ.data ?? [];
+
+  return (
+    <section className="mt-12 border-t border-border pt-8">
+      <h2 className="section-title text-2xl">Galéria kezelése</h2>
+      <p className="mt-2 text-sm text-muted-foreground">Itt töltse fel a Munkáink oldal képeit. A feltöltött képek azonnal megjelennek az oldalon, a megfelelő fül alatt.</p>
+      <div className="mt-4 flex flex-wrap items-center gap-3">
+        <select value={category} onChange={(e) => setCategory(e.target.value as "lakossagi" | "ipari")} className="h-10 border border-border bg-background px-2 text-sm">
+          <option value="lakossagi">Lakossági munkáink</option>
+          <option value="ipari">Ipari munkáink</option>
+        </select>
+        <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" disabled={busy}
+          onChange={(e) => e.target.files?.[0] && upload(e.target.files[0])} className="text-sm" />
+        {busy && <span className="text-sm text-muted-foreground">Dolgozom…</span>}
+      </div>
+      {error && <p className="mt-2 text-sm text-destructive">{error}</p>}
+      <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+        {rows.map((img) => (
+          <figure key={img.id} className="border border-border bg-background p-2">
+            {img.url && <img src={img.url} alt="" className="aspect-[4/3] w-full object-cover" />}
+            <figcaption className="mt-1 flex items-center justify-between gap-2 text-xs text-muted-foreground">
+              <span>{img.category === "lakossagi" ? "Lakossági" : "Ipari"}</span>
+              <button disabled={busy} onClick={() => remove(img.id, img.storage_path)} className="font-bold uppercase text-destructive underline">Törlés</button>
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+      {rows.length === 0 && !galleryQ.isLoading && <p className="mt-4 text-sm text-muted-foreground">Még nincs feltöltött kép.</p>}
+    </section>
   );
 }
