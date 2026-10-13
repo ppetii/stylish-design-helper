@@ -4,7 +4,7 @@ import { Facebook, ArrowRight, ArrowDown, Menu, X, ShieldCheck, Settings, ScanLi
 import { useServerFn } from "@tanstack/react-start";
 import { submitQuoteRequest } from "@/lib/quote.functions";
 import { Button } from "@/components/ui/button";
-import emblem from "@/assets/Vasmester.png.asset.json";
+import emblem from "@/assets/vasmester-logo.png";
 import hero from "@/assets/welding-hero.jpg";
 import gate from "@/assets/steel-gate.jpg";
 import structure from "@/assets/steel-structure.jpg";
@@ -37,7 +37,7 @@ const projectTypes = ["Kapu vagy kerítés", "Acélszerkezet", "Lépcső vagy ko
 
 function Brand() {
   return <a href="#kezdolap" className="flex shrink-0 items-center gap-2.5 text-hero-foreground" aria-label="Vasmester és Fiai – Kezdőlap">
-    <img src={emblem.url} alt="" className="h-11 w-9 object-contain sm:h-12 sm:w-10" />
+    <img src={emblem} alt="" className="h-11 w-9 object-contain sm:h-12 sm:w-10" />
     <span className="font-display text-xl font-extrabold uppercase leading-none sm:text-2xl"><span className="block text-primary">Vasmester</span><span className="block">és Fiai</span><span className="mt-1 block font-sans text-[8px] font-semibold tracking-[.19em] text-hero-muted sm:text-[9px]">FÉMIPARI MEGOLDÁSOK</span></span>
   </a>;
 }

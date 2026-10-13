@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { ArrowRight, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import emblem from "@/assets/Vasmester.png.asset.json";
+import emblem from "@/assets/vasmester-logo.png";
 
 export const Route = createFileRoute("/munkaink")({
   head: () => ({ meta: [
@@ -42,7 +42,7 @@ const all = Object.keys(files).sort().map((path) => ({ id: path, category: path.
 
 function Brand() {
   return <Link to="/" className="flex shrink-0 items-center gap-2.5 text-hero-foreground" aria-label="Vasmester és Fiai – Kezdőlap">
-    <img src={emblem.url} alt="" className="h-11 w-9 object-contain sm:h-12 sm:w-10" />
+    <img src={emblem} alt="" className="h-11 w-9 object-contain sm:h-12 sm:w-10" />
     <span className="font-display text-xl font-extrabold uppercase leading-none sm:text-2xl"><span className="block text-primary">Vasmester</span><span className="block">és Fiai</span><span className="mt-1 block font-sans text-[8px] font-semibold tracking-[.19em] text-hero-muted sm:text-[9px]">FÉMIPARI MEGOLDÁSOK</span></span>
   </Link>;
 }
