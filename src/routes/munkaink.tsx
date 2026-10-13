@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { ArrowRight, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import emblem from "@/assets/Vasmester.png.asset.json";
+import emblem from "@/assets/vasmester-logo.png";
 
 export const Route = createFileRoute("/munkaink")({
   head: () => ({ meta: [

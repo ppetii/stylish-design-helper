@@ -4,7 +4,7 @@ import { Facebook, ArrowRight, ArrowDown, Menu, X, ShieldCheck, Settings, ScanLi
 import { useServerFn } from "@tanstack/react-start";
 import { submitQuoteRequest } from "@/lib/quote.functions";
 import { Button } from "@/components/ui/button";
-import emblem from "@/assets/Vasmester.png.asset.json";
+import emblem from "@/assets/vasmester-logo.png";
 import hero from "@/assets/welding-hero.jpg";
 import gate from "@/assets/steel-gate.jpg";
 import structure from "@/assets/steel-structure.jpg";
